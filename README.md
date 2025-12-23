@@ -22,7 +22,7 @@
 
 Humanoid BOT is an automated tool designed to streamline onchain operations across multiple accounts. It provides seamless integration with Humanoid network and offers robust proxy support for enhanced security and reliability.
 
-**🔗 Get Started:** [Register on Humanoid](https://testnet.gokite.ai?referralCode=8SOHH7LG)
+**🔗 Get Started:** [Register on Humanoid](https://prelaunch.humanoidnetwork.org/ref/4FGZC3)
 
 > **Important:** Connect new evm wallet.
 
