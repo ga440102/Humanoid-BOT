@@ -19,10 +19,7 @@ class Humanoid:
     def __init__(self) -> None:
         self.BASE_API = "https://prelaunch.humanoidnetwork.org"
         self.HF_API = "https://huggingface.co"
-        self.CAPTCHA_API = "https://api.2captcha.com"
         self.REF_CODE = "4FGZC3" # U can change it with yours.
-        self.SITE_KEY = "6LcdlCcsAAAAAJGvjt5J030ySi7htRzB6rEeBgcP"
-        self.CAPTCHA_KEY = None
         self.HEADERS = {}
         self.proxies = []
         self.proxy_index = 0
@@ -53,15 +50,6 @@ class Humanoid:
         hours, remainder = divmod(seconds, 3600)
         minutes, seconds = divmod(remainder, 60)
         return f"{int(hours):02}:{int(minutes):02}:{int(seconds):02}"
-    
-    def load_2captcha_key(self):
-        try:
-            with open("2captcha_key.txt", 'r') as file:
-                captcha_key = file.read().strip()
-
-            return captcha_key
-        except Exception as e:
-            return None
     
     async def load_proxies(self):
         filename = "proxy.txt"
@@ -203,86 +191,6 @@ class Humanoid:
 
         return proxy_choice, rotate_proxy
     
-    async def solve_recaptcha(self, retries=5):
-        for attempt in range(retries):
-            try:
-                async with ClientSession(timeout=ClientTimeout(total=60)) as session:
-                    
-                    if self.CAPTCHA_KEY is None:
-                        self.log(
-                            f"{Fore.BLUE + Style.BRIGHT}   Status : {Style.RESET_ALL}"
-                            f"{Fore.YELLOW + Style.BRIGHT}Captcha Key Is None{Style.RESET_ALL}"
-                        )
-                        return None
-
-                    url = f"{self.CAPTCHA_API}/createTask"
-                    data = json.dumps({
-                        "clientKey": self.CAPTCHA_KEY,
-                        "task": {
-                            "type": "RecaptchaV2TaskProxyless",
-                            "websiteURL": self.BASE_API,
-                            "websiteKey": self.SITE_KEY,
-                            "isInvisible": False
-                        }
-                    })
-                    async with session.post(url=url, data=data) as response:
-                        response.raise_for_status()
-                        result_text = await response.text()
-                        result_json = json.loads(result_text)
-
-                        if result_json.get("errorId") != 0:
-                            err_text = result_json.get("errorDescription", "Unknown Error")
-                            
-                            self.log(
-                                f"{Fore.BLUE + Style.BRIGHT}   Message: {Style.RESET_ALL}"
-                                f"{Fore.YELLOW + Style.BRIGHT}{err_text}{Style.RESET_ALL}"
-                            )
-                            await asyncio.sleep(5)
-                            continue
-
-                        task_id = result_json.get("taskId")
-                        self.log(
-                            f"{Fore.BLUE + Style.BRIGHT}   Task Id: {Style.RESET_ALL}"
-                            f"{Fore.WHITE + Style.BRIGHT}{task_id}{Style.RESET_ALL}"
-                        )
-
-                        for _ in range(30):
-                            res_url = f"{self.CAPTCHA_API}/getTaskResult"
-                            res_data = json.dumps({
-                                "clientKey": self.CAPTCHA_KEY,
-                                "taskId": task_id
-                            })
-                            async with session.post(url=res_url, data=res_data) as res_response:
-                                res_response.raise_for_status()
-                                res_result_text = await res_response.text()
-                                res_result_json = json.loads(res_result_text)
-
-                                if res_result_json.get("status") == "ready":
-                                    recaptcha_token = res_result_json["solution"]["token"]
-                                    return recaptcha_token
-                                
-                                elif res_result_json.get("status") == "processing":
-                                    self.log(
-                                        f"{Fore.BLUE + Style.BRIGHT}   Message: {Style.RESET_ALL}"
-                                        f"{Fore.YELLOW + Style.BRIGHT}Recaptcha Not Ready{Style.RESET_ALL}"
-                                    )
-                                    await asyncio.sleep(5)
-                                    continue
-                                else:
-                                    break
-
-            except (Exception, ClientResponseError) as e:
-                if attempt < retries - 1:
-                    await asyncio.sleep(5)
-                    continue
-                self.log(
-                    f"{Fore.BLUE + Style.BRIGHT}   Status : {Style.RESET_ALL}"
-                    f"{Fore.RED + Style.BRIGHT}Recaptcha Unsolved{Style.RESET_ALL}"
-                    f"{Fore.MAGENTA + Style.BRIGHT} - {Style.RESET_ALL}"
-                    f"{Fore.YELLOW + Style.BRIGHT}{str(e)}{Style.RESET_ALL}"
-                )
-                return None
-    
     async def check_connection(self, proxy_url=None):
         connector, proxy, proxy_auth = self.build_proxy_config(proxy_url)
         try:
@@ -308,6 +216,7 @@ class Humanoid:
             "Content-Length": str(len(data)),
             "Content-Type": "application/json"
         }
+        await asyncio.sleep(1)
         for attempt in range(retries):
             connector, proxy, proxy_auth = self.build_proxy_config(proxy_url)
             try:
@@ -336,6 +245,7 @@ class Humanoid:
             "Content-Length": str(len(data)),
             "Content-Type": "application/json"
         }
+        await asyncio.sleep(1)
         for attempt in range(retries):
             connector, proxy, proxy_auth = self.build_proxy_config(proxy_url)
             try:
@@ -362,6 +272,7 @@ class Humanoid:
             **self.HEADERS[address],
             "Authorization": f"Bearer {self.access_tokens[address]}"
         }
+        await asyncio.sleep(1)
         for attempt in range(retries):
             connector, proxy, proxy_auth = self.build_proxy_config(proxy_url)
             try:
@@ -391,6 +302,7 @@ class Humanoid:
             "Content-Length": str(len(data)),
             "Content-Type": "application/json"
         }
+        await asyncio.sleep(1)
         for attempt in range(retries):
             connector, proxy, proxy_auth = self.build_proxy_config(proxy_url)
             try:
@@ -418,6 +330,7 @@ class Humanoid:
             **self.HEADERS[address],
             "Authorization": f"Bearer {self.access_tokens[address]}"
         }
+        await asyncio.sleep(1)
         for attempt in range(retries):
             connector, proxy, proxy_auth = self.build_proxy_config(proxy_url)
             try:
@@ -470,6 +383,7 @@ class Humanoid:
             "Content-Length": str(len(data)),
             "Content-Type": "application/json"
         }
+        await asyncio.sleep(1)
         for attempt in range(retries):
             connector, proxy, proxy_auth = self.build_proxy_config(proxy_url)
             try:
@@ -496,6 +410,7 @@ class Humanoid:
             **self.HEADERS[address],
             "Authorization": f"Bearer {self.access_tokens[address]}"
         }
+        await asyncio.sleep(1)
         for attempt in range(retries):
             connector, proxy, proxy_auth = self.build_proxy_config(proxy_url)
             try:
@@ -525,6 +440,7 @@ class Humanoid:
             "Content-Length": str(len(data)),
             "Content-Type": "application/json"
         }
+        await asyncio.sleep(1)
         for attempt in range(retries):
             connector, proxy, proxy_auth = self.build_proxy_config(proxy_url)
             try:
@@ -622,54 +538,46 @@ class Humanoid:
                 models_limit = progress.get("daily", {}).get("models", {}).get("limit")
                 models_remaining = progress.get("daily", {}).get("models", {}).get("remaining")
 
-                captcha_token = ""
-
                 self.log(f"{Fore.GREEN+Style.BRIGHT} ● {Style.RESET_ALL}"
                     f"{Fore.WHITE+Style.BRIGHT}Models{Style.RESET_ALL}"
                 )
                 if models_remaining > 0:
                     models = await self.scrape_huggingface("models", models_remaining, proxy)
                     if models:
-                        # captcha_token = await self.solve_recaptcha()
-                        # if captcha_token:
-                        #     self.log(
-                        #         f"{Fore.BLUE+Style.BRIGHT}   Captcha:{Style.RESET_ALL}"
-                        #         f"{Fore.GREEN+Style.BRIGHT} Recaptcha Solved Successfully {Style.RESET_ALL}"
-                        #     )
 
-                            for model in models:
-                                model_name = model["id"]
-                                model_url = f"{self.HF_API}/{model['id']}"
+                        for model in models:
+                            model_name = model["id"]
+                            model_url = f"{self.HF_API}/{model['id']}"
 
-                                training_data = {
-                                    "fileName": model_name,
-                                    "fileUrl": model_url,
-                                    "fileType": "model",
-                                    "recaptchaToken": captcha_token
-                                }
+                            training_data = {
+                                "fileName": model_name,
+                                "fileUrl": model_url,
+                                "fileType": "model",
+                                "recaptchaToken": ""
+                            }
 
+                            self.log(
+                                f"{Fore.BLUE+Style.BRIGHT}   ==={Style.RESET_ALL}"
+                                f"{Fore.WHITE+Style.BRIGHT} {models_completed+1} Of {models_limit} {Style.RESET_ALL}"
+                                f"{Fore.BLUE+Style.BRIGHT}==={Style.RESET_ALL}"
+                            )
+
+                            submit = await self.submit_training(address, training_data, proxy)
+                            if submit:
                                 self.log(
-                                    f"{Fore.BLUE+Style.BRIGHT}   ==={Style.RESET_ALL}"
-                                    f"{Fore.WHITE+Style.BRIGHT} {models_completed+1} Of {models_limit} {Style.RESET_ALL}"
-                                    f"{Fore.BLUE+Style.BRIGHT}==={Style.RESET_ALL}"
+                                    f"{Fore.BLUE+Style.BRIGHT}   Status :{Style.RESET_ALL}"
+                                    f"{Fore.GREEN+Style.BRIGHT} Model Submited Successfully {Style.RESET_ALL}"
+                                )
+                                self.log(
+                                    f"{Fore.BLUE+Style.BRIGHT}   Name   :{Style.RESET_ALL}"
+                                    f"{Fore.WHITE+Style.BRIGHT} {model_name} {Style.RESET_ALL}"
+                                )
+                                self.log(
+                                    f"{Fore.BLUE+Style.BRIGHT}   URL    :{Style.RESET_ALL}"
+                                    f"{Fore.WHITE+Style.BRIGHT} {model_url} {Style.RESET_ALL}"
                                 )
 
-                                submit = await self.submit_training(address, training_data, proxy)
-                                if submit:
-                                    self.log(
-                                        f"{Fore.BLUE+Style.BRIGHT}   Status :{Style.RESET_ALL}"
-                                        f"{Fore.GREEN+Style.BRIGHT} Model Submited Successfully {Style.RESET_ALL}"
-                                    )
-                                    self.log(
-                                        f"{Fore.BLUE+Style.BRIGHT}   Name   :{Style.RESET_ALL}"
-                                        f"{Fore.WHITE+Style.BRIGHT} {model_name} {Style.RESET_ALL}"
-                                    )
-                                    self.log(
-                                        f"{Fore.BLUE+Style.BRIGHT}   URL    :{Style.RESET_ALL}"
-                                        f"{Fore.WHITE+Style.BRIGHT} {model_url} {Style.RESET_ALL}"
-                                    )
-
-                                models_completed+=1
+                            models_completed+=1
 
                 else:
                     self.log(
@@ -687,46 +595,40 @@ class Humanoid:
                 if datasets_remaining > 0:
                     datasets = await self.scrape_huggingface("datasets", datasets_remaining, proxy)
                     if datasets:
-                        # captcha_token = await self.solve_recaptcha()
-                        # if captcha_token:
-                        #     self.log(
-                        #         f"{Fore.BLUE+Style.BRIGHT}   Captcha:{Style.RESET_ALL}"
-                        #         f"{Fore.GREEN+Style.BRIGHT} Recaptcha Solved Successfully {Style.RESET_ALL}"
-                        #     )
 
-                            for dataset in datasets:
-                                dataset_name = dataset["id"]
-                                dataset_url = f"{self.HF_API}/datasets/{dataset['id']}"
+                        for dataset in datasets:
+                            dataset_name = dataset["id"]
+                            dataset_url = f"{self.HF_API}/datasets/{dataset['id']}"
 
-                                training_data = {
-                                    "fileName": dataset_name,
-                                    "fileUrl": dataset_url,
-                                    "fileType": "dataset",
-                                    "recaptchaToken": captcha_token
-                                }
+                            training_data = {
+                                "fileName": dataset_name,
+                                "fileUrl": dataset_url,
+                                "fileType": "dataset",
+                                "recaptchaToken": ""
+                            }
 
+                            self.log(
+                                f"{Fore.BLUE+Style.BRIGHT}   ==={Style.RESET_ALL}"
+                                f"{Fore.WHITE+Style.BRIGHT} {datasets_completed+1} Of {datasets_limit} {Style.RESET_ALL}"
+                                f"{Fore.BLUE+Style.BRIGHT}==={Style.RESET_ALL}"
+                            )
+
+                            submit = await self.submit_training(address, training_data, proxy)
+                            if submit:
                                 self.log(
-                                    f"{Fore.BLUE+Style.BRIGHT}   ==={Style.RESET_ALL}"
-                                    f"{Fore.WHITE+Style.BRIGHT} {datasets_completed+1} Of {datasets_limit} {Style.RESET_ALL}"
-                                    f"{Fore.BLUE+Style.BRIGHT}==={Style.RESET_ALL}"
+                                    f"{Fore.BLUE+Style.BRIGHT}   Status :{Style.RESET_ALL}"
+                                    f"{Fore.GREEN+Style.BRIGHT} Dataset Submited Successfully {Style.RESET_ALL}"
+                                )
+                                self.log(
+                                    f"{Fore.BLUE+Style.BRIGHT}   Name   :{Style.RESET_ALL}"
+                                    f"{Fore.WHITE+Style.BRIGHT} {dataset_name} {Style.RESET_ALL}"
+                                )
+                                self.log(
+                                    f"{Fore.BLUE+Style.BRIGHT}   URL    :{Style.RESET_ALL}"
+                                    f"{Fore.WHITE+Style.BRIGHT} {dataset_url} {Style.RESET_ALL}"
                                 )
 
-                                submit = await self.submit_training(address, training_data, proxy)
-                                if submit:
-                                    self.log(
-                                        f"{Fore.BLUE+Style.BRIGHT}   Status :{Style.RESET_ALL}"
-                                        f"{Fore.GREEN+Style.BRIGHT} Dataset Submited Successfully {Style.RESET_ALL}"
-                                    )
-                                    self.log(
-                                        f"{Fore.BLUE+Style.BRIGHT}   Name   :{Style.RESET_ALL}"
-                                        f"{Fore.WHITE+Style.BRIGHT} {dataset_name} {Style.RESET_ALL}"
-                                    )
-                                    self.log(
-                                        f"{Fore.BLUE+Style.BRIGHT}   URL    :{Style.RESET_ALL}"
-                                        f"{Fore.WHITE+Style.BRIGHT} {dataset_url} {Style.RESET_ALL}"
-                                    )
-
-                                datasets_completed+=1
+                            datasets_completed+=1
 
                 else:
                     self.log(
@@ -763,10 +665,6 @@ class Humanoid:
         try:
             with open('accounts.txt', 'r') as file:
                 accounts = [line.strip() for line in file if line.strip()]
-
-            captcha_key = self.load_2captcha_key()
-            if captcha_key:
-                self.CAPTCHA_KEY = captcha_key
 
             proxy_choice, rotate_proxy = self.print_question()
 
