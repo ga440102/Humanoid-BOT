@@ -19,7 +19,7 @@ class Humanoid:
     def __init__(self) -> None:
         self.BASE_API = "https://prelaunch.humanoidnetwork.org"
         self.HF_API = "https://huggingface.co"
-        self.REF_CODE = "4FGZC3" # U can change it with yours.
+        self.REF_CODE = "HKH4KB" # U can change it with yours.
         self.HEADERS = {}
         self.proxies = []
         self.proxy_index = 0
