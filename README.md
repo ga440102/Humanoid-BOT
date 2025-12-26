@@ -128,11 +128,3 @@ When starting the bot, you'll be prompted to choose:
    - `n`: Disable auto-rotation
 
 
-
-
-
-**Made with ❤️ by [vonssy](https://github.com/vonssy)**
-
-*Thank you for using Humanoid BOT! Don't forget to ⭐ star this repository.*
-
-</div>
