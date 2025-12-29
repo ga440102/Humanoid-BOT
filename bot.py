@@ -19,7 +19,7 @@ class Humanoid:
     def __init__(self) -> None:
         self.BASE_API = "https://prelaunch.humanoidnetwork.org"
         self.HF_API = "https://huggingface.co"
-        self.REF_CODE = "HKH4KB" # U can change it with yours.
+        self.REF_CODE = "HKH4KB" # 可以替换成您的邀请码
         self.HEADERS = {}
         self.proxies = []
         self.proxy_index = 0
@@ -39,10 +39,10 @@ class Humanoid:
     def welcome(self):
         print(
             f"""
-        {Fore.GREEN + Style.BRIGHT}Humanoid {Fore.BLUE + Style.BRIGHT}Auto BOT
+        {Fore.GREEN + Style.BRIGHT}Humanoid {Fore.BLUE + Style.BRIGHT}自动任务机器人
             """
             f"""
-        {Fore.GREEN + Style.BRIGHT}Rey? {Fore.YELLOW + Style.BRIGHT}<INI WATERMARK>
+        {Fore.GREEN + Style.BRIGHT}版本 {Fore.YELLOW + Style.BRIGHT}<v1.0.0>
             """
         )
 
@@ -55,22 +55,22 @@ class Humanoid:
         filename = "proxy.txt"
         try:
             if not os.path.exists(filename):
-                self.log(f"{Fore.RED + Style.BRIGHT}File {filename} Not Found.{Style.RESET_ALL}")
+                self.log(f"{Fore.RED + Style.BRIGHT}未找到代理文件: {filename}{Style.RESET_ALL}")
                 return
             with open(filename, 'r') as f:
                 self.proxies = [line.strip() for line in f.read().splitlines() if line.strip()]
             
             if not self.proxies:
-                self.log(f"{Fore.RED + Style.BRIGHT}No Proxies Found.{Style.RESET_ALL}")
+                self.log(f"{Fore.RED + Style.BRIGHT}代理列表为空{Style.RESET_ALL}")
                 return
 
             self.log(
-                f"{Fore.GREEN + Style.BRIGHT}Proxies Total  : {Style.RESET_ALL}"
+                f"{Fore.GREEN + Style.BRIGHT}代理总数  : {Style.RESET_ALL}"
                 f"{Fore.WHITE + Style.BRIGHT}{len(self.proxies)}{Style.RESET_ALL}"
             )
         
         except Exception as e:
-            self.log(f"{Fore.RED + Style.BRIGHT}Failed To Load Proxies: {e}{Style.RESET_ALL}")
+            self.log(f"{Fore.RED + Style.BRIGHT}加载代理失败: {e}{Style.RESET_ALL}")
             self.proxies = []
 
     def check_proxy_schemes(self, proxies):
@@ -114,13 +114,12 @@ class Humanoid:
             else:
                 return None, proxy, None
 
-        raise Exception("Unsupported Proxy Type.")
+        raise Exception("不支持的代理类型")
         
     def generate_address(self, account: str):
         try:
             account = Account.from_key(account)
             address = account.address
-
             return address
         except Exception as e:
             return None
@@ -137,7 +136,7 @@ class Humanoid:
                 "message": message
             }
         except Exception as e:
-            raise Exception(f"Generate Req Payload Failed: {str(e)}")
+            raise Exception(f"生成请求负载失败: {str(e)}")
         
     def generate_random_x_handle(self, min_len=5, max_len=12):
         chars = string.ascii_lowercase + string.digits
@@ -162,32 +161,32 @@ class Humanoid:
     def print_question(self):
         while True:
             try:
-                print(f"{Fore.WHITE + Style.BRIGHT}1. Run With Proxy{Style.RESET_ALL}")
-                print(f"{Fore.WHITE + Style.BRIGHT}2. Run Without Proxy{Style.RESET_ALL}")
-                proxy_choice = int(input(f"{Fore.BLUE + Style.BRIGHT}Choose [1/2] -> {Style.RESET_ALL}").strip())
+                print(f"{Fore.WHITE + Style.BRIGHT}1. 使用代理运行{Style.RESET_ALL}")
+                print(f"{Fore.WHITE + Style.BRIGHT}2. 不使用代理运行{Style.RESET_ALL}")
+                proxy_choice = int(input(f"{Fore.BLUE + Style.BRIGHT}请选择 [1/2] -> {Style.RESET_ALL}").strip())
 
                 if proxy_choice in [1, 2]:
                     proxy_type = (
-                        "With" if proxy_choice == 1 else 
-                        "Without"
+                        "使用" if proxy_choice == 1 else 
+                        "不使用"
                     )
-                    print(f"{Fore.GREEN + Style.BRIGHT}Run {proxy_type} Proxy Selected.{Style.RESET_ALL}")
+                    print(f"{Fore.GREEN + Style.BRIGHT}已选择{proxy_type}代理{Style.RESET_ALL}")
                     break
                 else:
-                    print(f"{Fore.RED + Style.BRIGHT}Please enter either 1 or 2.{Style.RESET_ALL}")
+                    print(f"{Fore.RED + Style.BRIGHT}请输入1或2{Style.RESET_ALL}")
             except ValueError:
-                print(f"{Fore.RED + Style.BRIGHT}Invalid input. Enter a number (1 or 2).{Style.RESET_ALL}")
+                print(f"{Fore.RED + Style.BRIGHT}无效输入，请输入数字1或2{Style.RESET_ALL}")
 
         rotate_proxy = False
         if proxy_choice == 1:
             while True:
-                rotate_proxy = input(f"{Fore.BLUE + Style.BRIGHT}Rotate Invalid Proxy? [y/n] -> {Style.RESET_ALL}").strip()
+                rotate_proxy = input(f"{Fore.BLUE + Style.BRIGHT}代理失败时自动切换? [y/n] -> {Style.RESET_ALL}").strip().lower()
 
                 if rotate_proxy in ["y", "n"]:
                     rotate_proxy = rotate_proxy == "y"
                     break
                 else:
-                    print(f"{Fore.RED + Style.BRIGHT}Invalid input. Enter 'y' or 'n'.{Style.RESET_ALL}")
+                    print(f"{Fore.RED + Style.BRIGHT}无效输入，请输入 'y' 或 'n'{Style.RESET_ALL}")
 
         return proxy_choice, rotate_proxy
     
@@ -200,8 +199,8 @@ class Humanoid:
                     return True
         except (Exception, ClientResponseError) as e:
             self.log(
-                f"{Fore.CYAN+Style.BRIGHT}Status  :{Style.RESET_ALL}"
-                f"{Fore.RED+Style.BRIGHT} Connection Not 200 OK {Style.RESET_ALL}"
+                f"{Fore.CYAN+Style.BRIGHT}状态  :{Style.RESET_ALL}"
+                f"{Fore.RED+Style.BRIGHT} 连接失败 {Style.RESET_ALL}"
                 f"{Fore.MAGENTA+Style.BRIGHT}-{Style.RESET_ALL}"
                 f"{Fore.YELLOW+Style.BRIGHT} {str(e)} {Style.RESET_ALL}"
             )
@@ -229,8 +228,8 @@ class Humanoid:
                     await asyncio.sleep(5)
                     continue
                 self.log(
-                    f"{Fore.CYAN+Style.BRIGHT}Status  :{Style.RESET_ALL}"
-                    f"{Fore.RED+Style.BRIGHT} Fetch Nonce Failed {Style.RESET_ALL}"
+                    f"{Fore.CYAN+Style.BRIGHT}状态  :{Style.RESET_ALL}"
+                    f"{Fore.RED+Style.BRIGHT} 获取Nonce失败 {Style.RESET_ALL}"
                     f"{Fore.MAGENTA+Style.BRIGHT}-{Style.RESET_ALL}"
                     f"{Fore.YELLOW+Style.BRIGHT} {str(e)} {Style.RESET_ALL}"
                 )
@@ -258,8 +257,8 @@ class Humanoid:
                     await asyncio.sleep(5)
                     continue
                 self.log(
-                    f"{Fore.CYAN+Style.BRIGHT}Status  :{Style.RESET_ALL}"
-                    f"{Fore.RED+Style.BRIGHT} Login Failed {Style.RESET_ALL}"
+                    f"{Fore.CYAN+Style.BRIGHT}状态  :{Style.RESET_ALL}"
+                    f"{Fore.RED+Style.BRIGHT} 登录失败 {Style.RESET_ALL}"
                     f"{Fore.MAGENTA+Style.BRIGHT}-{Style.RESET_ALL}"
                     f"{Fore.YELLOW+Style.BRIGHT} {str(e)} {Style.RESET_ALL}"
                 )
@@ -285,8 +284,8 @@ class Humanoid:
                     await asyncio.sleep(5)
                     continue
                 self.log(
-                    f"{Fore.CYAN+Style.BRIGHT}Status  :{Style.RESET_ALL}"
-                    f"{Fore.RED+Style.BRIGHT} Failed to fetch user data {Style.RESET_ALL}"
+                    f"{Fore.CYAN+Style.BRIGHT}状态  :{Style.RESET_ALL}"
+                    f"{Fore.RED+Style.BRIGHT} 获取用户数据失败 {Style.RESET_ALL}"
                     f"{Fore.MAGENTA+Style.BRIGHT}-{Style.RESET_ALL}"
                     f"{Fore.YELLOW+Style.BRIGHT} {str(e)} {Style.RESET_ALL}"
                 )
@@ -316,8 +315,8 @@ class Humanoid:
                     await asyncio.sleep(5)
                     continue
                 self.log(
-                    f"{Fore.CYAN+Style.BRIGHT}Status  :{Style.RESET_ALL}"
-                    f"{Fore.RED+Style.BRIGHT} Apply Ref Failed {Style.RESET_ALL}"
+                    f"{Fore.CYAN+Style.BRIGHT}状态  :{Style.RESET_ALL}"
+                    f"{Fore.RED+Style.BRIGHT} 应用推荐码失败 {Style.RESET_ALL}"
                     f"{Fore.MAGENTA+Style.BRIGHT}-{Style.RESET_ALL}"
                     f"{Fore.YELLOW+Style.BRIGHT} {str(e)} {Style.RESET_ALL}"
                 )
@@ -343,8 +342,8 @@ class Humanoid:
                     await asyncio.sleep(5)
                     continue
                 self.log(
-                    f"{Fore.CYAN+Style.BRIGHT}Training:{Style.RESET_ALL}"
-                    f"{Fore.RED+Style.BRIGHT} Failed to fetch progress data {Style.RESET_ALL}"
+                    f"{Fore.CYAN+Style.BRIGHT}训练进度:{Style.RESET_ALL}"
+                    f"{Fore.RED+Style.BRIGHT} 获取进度数据失败 {Style.RESET_ALL}"
                     f"{Fore.MAGENTA+Style.BRIGHT}-{Style.RESET_ALL}"
                     f"{Fore.YELLOW+Style.BRIGHT} {str(e)} {Style.RESET_ALL}"
                 )
@@ -366,8 +365,8 @@ class Humanoid:
                     await asyncio.sleep(5)
                     continue
                 self.log(
-                    f"{Fore.BLUE+Style.BRIGHT}   Status :{Style.RESET_ALL}"
-                    f"{Fore.RED+Style.BRIGHT} Failed to scrape {endpoint} data from huggingface {Style.RESET_ALL}"
+                    f"{Fore.BLUE+Style.BRIGHT}   状态 :{Style.RESET_ALL}"
+                    f"{Fore.RED+Style.BRIGHT} 从HuggingFace获取{endpoint}数据失败 {Style.RESET_ALL}"
                     f"{Fore.MAGENTA+Style.BRIGHT}-{Style.RESET_ALL}"
                     f"{Fore.YELLOW+Style.BRIGHT} {str(e)} {Style.RESET_ALL}"
                 )
@@ -396,8 +395,8 @@ class Humanoid:
                     await asyncio.sleep(5)
                     continue
                 self.log(
-                    f"{Fore.BLUE+Style.BRIGHT}   Status :{Style.RESET_ALL}"
-                    f"{Fore.RED+Style.BRIGHT} Submit Failed {Style.RESET_ALL}"
+                    f"{Fore.BLUE+Style.BRIGHT}   状态 :{Style.RESET_ALL}"
+                    f"{Fore.RED+Style.BRIGHT} 提交失败 {Style.RESET_ALL}"
                     f"{Fore.MAGENTA+Style.BRIGHT}-{Style.RESET_ALL}"
                     f"{Fore.YELLOW+Style.BRIGHT} {str(e)} {Style.RESET_ALL}"
                 )
@@ -423,8 +422,8 @@ class Humanoid:
                     await asyncio.sleep(5)
                     continue
                 self.log(
-                    f"{Fore.CYAN+Style.BRIGHT}Tasks   :{Style.RESET_ALL}"
-                    f"{Fore.RED+Style.BRIGHT} Failed to fetch tasks data {Style.RESET_ALL}"
+                    f"{Fore.CYAN+Style.BRIGHT}任务列表:{Style.RESET_ALL}"
+                    f"{Fore.RED+Style.BRIGHT} 获取任务数据失败 {Style.RESET_ALL}"
                     f"{Fore.MAGENTA+Style.BRIGHT}-{Style.RESET_ALL}"
                     f"{Fore.YELLOW+Style.BRIGHT} {str(e)} {Style.RESET_ALL}"
                 )
@@ -450,7 +449,7 @@ class Humanoid:
                             self.log(
                                 f"{Fore.GREEN+Style.BRIGHT} ● {Style.RESET_ALL}"
                                 f"{Fore.WHITE+Style.BRIGHT}{title}{Style.RESET_ALL}"
-                                f"{Fore.YELLOW+Style.BRIGHT} Already Completed {Style.RESET_ALL}"
+                                f"{Fore.YELLOW+Style.BRIGHT} 任务已完成 {Style.RESET_ALL}"
                             )
                             return False
                         
@@ -463,7 +462,7 @@ class Humanoid:
                 self.log(
                     f"{Fore.GREEN+Style.BRIGHT} ● {Style.RESET_ALL}"
                     f"{Fore.WHITE+Style.BRIGHT}{title}{Style.RESET_ALL}"
-                    f"{Fore.RED+Style.BRIGHT} Not Completed {Style.RESET_ALL}"
+                    f"{Fore.RED+Style.BRIGHT} 任务未完成 {Style.RESET_ALL}"
                     f"{Fore.MAGENTA+Style.BRIGHT}-{Style.RESET_ALL}"
                     f"{Fore.YELLOW+Style.BRIGHT} {str(e)} {Style.RESET_ALL}"
                 )
@@ -474,7 +473,7 @@ class Humanoid:
         while True:
             proxy = self.get_next_proxy_for_account(address) if use_proxy else None
             self.log(
-                f"{Fore.CYAN+Style.BRIGHT}Proxy   :{Style.RESET_ALL}"
+                f"{Fore.CYAN+Style.BRIGHT}代理   :{Style.RESET_ALL}"
                 f"{Fore.WHITE+Style.BRIGHT} {proxy} {Style.RESET_ALL}"
             )
 
@@ -505,8 +504,8 @@ class Humanoid:
             self.access_tokens[address] = authenticate.get("token")
 
             self.log(
-                f"{Fore.CYAN + Style.BRIGHT}Status  :{Style.RESET_ALL}"
-                f"{Fore.GREEN + Style.BRIGHT} Login Success {Style.RESET_ALL}"
+                f"{Fore.CYAN + Style.BRIGHT}状态  :{Style.RESET_ALL}"
+                f"{Fore.GREEN + Style.BRIGHT} 登录成功 {Style.RESET_ALL}"
             )
             return True
 
@@ -526,25 +525,24 @@ class Humanoid:
                 await self.apply_ref(address, proxy)
 
             self.log(
-                f"{Fore.CYAN + Style.BRIGHT}Points  :{Style.RESET_ALL}"
+                f"{Fore.CYAN + Style.BRIGHT}积分  :{Style.RESET_ALL}"
                 f"{Fore.WHITE + Style.BRIGHT} {total_points} {Style.RESET_ALL}"
             )
 
             progress = await self.training_progress(address, proxy)
             if progress:
-                self.log(f"{Fore.CYAN+Style.BRIGHT}Training:{Style.RESET_ALL}")
+                self.log(f"{Fore.CYAN+Style.BRIGHT}训练进度:{Style.RESET_ALL}")
 
                 models_completed = progress.get("daily", {}).get("models", {}).get("completed")
                 models_limit = progress.get("daily", {}).get("models", {}).get("limit")
                 models_remaining = progress.get("daily", {}).get("models", {}).get("remaining")
 
                 self.log(f"{Fore.GREEN+Style.BRIGHT} ● {Style.RESET_ALL}"
-                    f"{Fore.WHITE+Style.BRIGHT}Models{Style.RESET_ALL}"
+                    f"{Fore.WHITE+Style.BRIGHT}模型训练{Style.RESET_ALL}"
                 )
                 if models_remaining > 0:
                     models = await self.scrape_huggingface("models", models_remaining, proxy)
                     if models:
-
                         for model in models:
                             model_name = model["id"]
                             model_url = f"{self.HF_API}/{model['id']}"
@@ -558,22 +556,22 @@ class Humanoid:
 
                             self.log(
                                 f"{Fore.BLUE+Style.BRIGHT}   ==={Style.RESET_ALL}"
-                                f"{Fore.WHITE+Style.BRIGHT} {models_completed+1} Of {models_limit} {Style.RESET_ALL}"
+                                f"{Fore.WHITE+Style.BRIGHT} 第 {models_completed+1} 个 / 共 {models_limit} 个 {Style.RESET_ALL}"
                                 f"{Fore.BLUE+Style.BRIGHT}==={Style.RESET_ALL}"
                             )
 
                             submit = await self.submit_training(address, training_data, proxy)
                             if submit:
                                 self.log(
-                                    f"{Fore.BLUE+Style.BRIGHT}   Status :{Style.RESET_ALL}"
-                                    f"{Fore.GREEN+Style.BRIGHT} Model Submited Successfully {Style.RESET_ALL}"
+                                    f"{Fore.BLUE+Style.BRIGHT}   状态 :{Style.RESET_ALL}"
+                                    f"{Fore.GREEN+Style.BRIGHT} 模型提交成功 {Style.RESET_ALL}"
                                 )
                                 self.log(
-                                    f"{Fore.BLUE+Style.BRIGHT}   Name   :{Style.RESET_ALL}"
+                                    f"{Fore.BLUE+Style.BRIGHT}   名称 :{Style.RESET_ALL}"
                                     f"{Fore.WHITE+Style.BRIGHT} {model_name} {Style.RESET_ALL}"
                                 )
                                 self.log(
-                                    f"{Fore.BLUE+Style.BRIGHT}   URL    :{Style.RESET_ALL}"
+                                    f"{Fore.BLUE+Style.BRIGHT}   链接 :{Style.RESET_ALL}"
                                     f"{Fore.WHITE+Style.BRIGHT} {model_url} {Style.RESET_ALL}"
                                 )
 
@@ -581,8 +579,8 @@ class Humanoid:
 
                 else:
                     self.log(
-                        f"{Fore.BLUE+Style.BRIGHT}   Status :{Style.RESET_ALL}"
-                        f"{Fore.YELLOW+Style.BRIGHT} Daily Limit Reached [{models_completed}/{models_limit}] {Style.RESET_ALL}"
+                        f"{Fore.BLUE+Style.BRIGHT}   状态 :{Style.RESET_ALL}"
+                        f"{Fore.YELLOW+Style.BRIGHT} 每日模型训练次数已用完 [{models_completed}/{models_limit}] {Style.RESET_ALL}"
                     )
 
                 datasets_completed = progress.get("daily", {}).get("datasets", {}).get("completed")
@@ -590,12 +588,11 @@ class Humanoid:
                 datasets_remaining = progress.get("daily", {}).get("datasets", {}).get("remaining")
 
                 self.log(f"{Fore.GREEN+Style.BRIGHT} ● {Style.RESET_ALL}"
-                    f"{Fore.WHITE+Style.BRIGHT}Datasets{Style.RESET_ALL}"
+                    f"{Fore.WHITE+Style.BRIGHT}数据集训练{Style.RESET_ALL}"
                 )
                 if datasets_remaining > 0:
                     datasets = await self.scrape_huggingface("datasets", datasets_remaining, proxy)
                     if datasets:
-
                         for dataset in datasets:
                             dataset_name = dataset["id"]
                             dataset_url = f"{self.HF_API}/datasets/{dataset['id']}"
@@ -609,22 +606,22 @@ class Humanoid:
 
                             self.log(
                                 f"{Fore.BLUE+Style.BRIGHT}   ==={Style.RESET_ALL}"
-                                f"{Fore.WHITE+Style.BRIGHT} {datasets_completed+1} Of {datasets_limit} {Style.RESET_ALL}"
+                                f"{Fore.WHITE+Style.BRIGHT} 第 {datasets_completed+1} 个 / 共 {datasets_limit} 个 {Style.RESET_ALL}"
                                 f"{Fore.BLUE+Style.BRIGHT}==={Style.RESET_ALL}"
                             )
 
                             submit = await self.submit_training(address, training_data, proxy)
                             if submit:
                                 self.log(
-                                    f"{Fore.BLUE+Style.BRIGHT}   Status :{Style.RESET_ALL}"
-                                    f"{Fore.GREEN+Style.BRIGHT} Dataset Submited Successfully {Style.RESET_ALL}"
+                                    f"{Fore.BLUE+Style.BRIGHT}   状态 :{Style.RESET_ALL}"
+                                    f"{Fore.GREEN+Style.BRIGHT} 数据集提交成功 {Style.RESET_ALL}"
                                 )
                                 self.log(
-                                    f"{Fore.BLUE+Style.BRIGHT}   Name   :{Style.RESET_ALL}"
+                                    f"{Fore.BLUE+Style.BRIGHT}   名称 :{Style.RESET_ALL}"
                                     f"{Fore.WHITE+Style.BRIGHT} {dataset_name} {Style.RESET_ALL}"
                                 )
                                 self.log(
-                                    f"{Fore.BLUE+Style.BRIGHT}   URL    :{Style.RESET_ALL}"
+                                    f"{Fore.BLUE+Style.BRIGHT}   链接 :{Style.RESET_ALL}"
                                     f"{Fore.WHITE+Style.BRIGHT} {dataset_url} {Style.RESET_ALL}"
                                 )
 
@@ -632,13 +629,13 @@ class Humanoid:
 
                 else:
                     self.log(
-                        f"{Fore.BLUE+Style.BRIGHT}   Status :{Style.RESET_ALL}"
-                        f"{Fore.YELLOW+Style.BRIGHT} Daily Limit Reached [{datasets_completed}/{datasets_limit}] {Style.RESET_ALL}"
+                        f"{Fore.BLUE+Style.BRIGHT}   状态 :{Style.RESET_ALL}"
+                        f"{Fore.YELLOW+Style.BRIGHT} 每日数据集训练次数已用完 [{datasets_completed}/{datasets_limit}] {Style.RESET_ALL}"
                     )
 
             tasks = await self.task_lists(address, proxy)
             if tasks:
-                self.log(f"{Fore.CYAN+Style.BRIGHT}Tasks   :{Style.RESET_ALL}")
+                self.log(f"{Fore.CYAN+Style.BRIGHT}任务列表:{Style.RESET_ALL}")
 
                 for task in tasks:
                     task_id = task.get("id")
@@ -655,10 +652,10 @@ class Humanoid:
                         self.log(
                             f"{Fore.GREEN+Style.BRIGHT} ● {Style.RESET_ALL}"
                             f"{Fore.WHITE+Style.BRIGHT}{title}{Style.RESET_ALL}"
-                            f"{Fore.GREEN+Style.BRIGHT} Completed {Style.RESET_ALL}"
+                            f"{Fore.GREEN+Style.BRIGHT} 任务完成 {Style.RESET_ALL}"
                             f"{Fore.MAGENTA+Style.BRIGHT}-{Style.RESET_ALL}"
-                            f"{Fore.CYAN+Style.BRIGHT} Reward: {Style.RESET_ALL}"
-                            f"{Fore.WHITE+Style.BRIGHT}{reward} Points{Style.RESET_ALL}"
+                            f"{Fore.CYAN+Style.BRIGHT} 奖励: {Style.RESET_ALL}"
+                            f"{Fore.WHITE+Style.BRIGHT}{reward} 积分{Style.RESET_ALL}"
                         )
             
     async def main(self):
@@ -667,16 +664,17 @@ class Humanoid:
                 accounts = [line.strip() for line in file if line.strip()]
 
             proxy_choice, rotate_proxy = self.print_question()
+            total_accounts = len(accounts)  # 获取账号总数
 
             while True:
                 self.clear_terminal()
                 self.welcome()
                 self.log(
-                    f"{Fore.GREEN + Style.BRIGHT}Account's Total: {Style.RESET_ALL}"
-                    f"{Fore.WHITE + Style.BRIGHT}{len(accounts)}{Style.RESET_ALL}"
+                    f"{Fore.GREEN + Style.BRIGHT}账号总数: {Style.RESET_ALL}"
+                    f"{Fore.WHITE + Style.BRIGHT}{total_accounts}{Style.RESET_ALL}"
                 )
 
-                use_proxy = True if proxy_choice == 1 else False
+                use_proxy = proxy_choice == 1
                 if use_proxy:
                     await self.load_proxies()
 
@@ -686,7 +684,7 @@ class Humanoid:
                         address = self.generate_address(account)
                         self.log(
                             f"{Fore.CYAN + Style.BRIGHT}{separator}[{Style.RESET_ALL}"
-                            f"{Fore.WHITE + Style.BRIGHT} {idx} {Style.RESET_ALL}"
+                            f"{Fore.WHITE + Style.BRIGHT} 账号 {idx}/{total_accounts} {Style.RESET_ALL}"  # 显示当前账号/总账号数
                             f"{Fore.CYAN + Style.BRIGHT}-{Style.RESET_ALL}"
                             f"{Fore.WHITE + Style.BRIGHT} {self.mask_account(address)} {Style.RESET_ALL}"
                             f"{Fore.CYAN + Style.BRIGHT}]{separator}{Style.RESET_ALL}"
@@ -694,8 +692,8 @@ class Humanoid:
 
                         if not address:
                             self.log(
-                                f"{Fore.CYAN + Style.BRIGHT}Status  :{Style.RESET_ALL}"
-                                f"{Fore.RED + Style.BRIGHT} Invalid Private Key or Library Version Not Supported {Style.RESET_ALL}"
+                                f"{Fore.CYAN + Style.BRIGHT}状态  :{Style.RESET_ALL}"
+                                f"{Fore.RED + Style.BRIGHT} 私钥无效或库版本不受支持 {Style.RESET_ALL}"
                             )
                             continue
 
@@ -714,15 +712,15 @@ class Humanoid:
 
                 self.log(f"{Fore.CYAN + Style.BRIGHT}={Style.RESET_ALL}"*72)
                 
-                delay = 12 * 60 * 60
+                delay = 12 * 60 * 60  # 12小时
                 while delay > 0:
                     formatted_time = self.format_seconds(delay)
                     print(
-                        f"{Fore.CYAN+Style.BRIGHT}[ Wait for{Style.RESET_ALL}"
+                        f"{Fore.CYAN+Style.BRIGHT}[ 等待{Style.RESET_ALL}"
                         f"{Fore.WHITE+Style.BRIGHT} {formatted_time} {Style.RESET_ALL}"
                         f"{Fore.CYAN+Style.BRIGHT}... ]{Style.RESET_ALL}"
                         f"{Fore.WHITE+Style.BRIGHT} | {Style.RESET_ALL}"
-                        f"{Fore.BLUE+Style.BRIGHT}All Accounts Have Been Processed...{Style.RESET_ALL}",
+                        f"{Fore.BLUE+Style.BRIGHT}所有账号处理完成，等待下次执行...{Style.RESET_ALL}",
                         end="\r",
                         flush=True
                     )
@@ -730,10 +728,10 @@ class Humanoid:
                     delay -= 1
 
         except FileNotFoundError:
-            self.log(f"{Fore.RED}File 'accounts.txt' Not Found.{Style.RESET_ALL}")
+            self.log(f"{Fore.RED}未找到 'accounts.txt' 文件{Style.RESET_ALL}")
             return
         except Exception as e:
-            self.log(f"{Fore.RED+Style.BRIGHT}Error: {e}{Style.RESET_ALL}")
+            self.log(f"{Fore.RED+Style.BRIGHT}错误: {e}{Style.RESET_ALL}")
             raise e
 
 if __name__ == "__main__":
@@ -744,5 +742,5 @@ if __name__ == "__main__":
         print(
             f"{Fore.CYAN + Style.BRIGHT}[ {datetime.now().astimezone(wib).strftime('%x %X %Z')} ]{Style.RESET_ALL}"
             f"{Fore.WHITE + Style.BRIGHT} | {Style.RESET_ALL}"
-            f"{Fore.RED + Style.BRIGHT}[ EXIT ] Humanoid - BOT{Style.RESET_ALL}                                       "                              
+            f"{Fore.RED + Style.BRIGHT}[ 退出 ] Humanoid - 机器人{Style.RESET_ALL}                                       "                              
         )
